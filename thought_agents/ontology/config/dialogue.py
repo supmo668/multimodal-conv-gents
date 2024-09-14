@@ -1,12 +1,13 @@
 from hydra.core.config_store import ConfigStore
 from dataclasses import dataclass, field
-from typing import List, Dict, AnyStr
+from typing import Any, Optional, List, Dict, AnyStr
 
 from pydantic import BaseModel, Field
 from thought_agents.ontology.chats.client import AutogenLLMConfig
 
 class Person(BaseModel):
     name: AnyStr = Field(..., description="name of the person")
+    sex: Optional[AnyStr] = Field(..., description="sex of the person")
     description: AnyStr = Field(..., description="A description of the person if known, otherwise just a generic character.")
 
 class PodcastCharacters(BaseModel):

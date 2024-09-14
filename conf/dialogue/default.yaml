@@ -4,7 +4,7 @@ defaults:
   - system_prompts: default
 
 llm_config:
-  cache_seed: 42
+  cache_seed: null
   temperature: 0
   timeout: 120
   config_list_path: "conf/OAI_CONFIG_LIST.txt"
