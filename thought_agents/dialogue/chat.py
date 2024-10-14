@@ -52,7 +52,8 @@ def main(cfg: DictConfig) -> None:
     initializer, manager = create_podcast_group(main_cfg)
     # parsers
     chat_result = initiation_registry.get_class("podcast")(
-        initializer, manager, main_cfg.podcast_config, main_cfg.system_prompts
+        initializer, manager, 
+        main_cfg.podcast_config, main_cfg.system_prompts
     )
     return chat_result.chat_history
 

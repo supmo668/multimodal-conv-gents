@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "thought-agents"
-version = "0.3.8"
+version = "0.3.11"
 description = "package for thoughtful agents partipating in stimulating, interactive conversations in a intra- & intro- spective manner"
 authors = ["supermomo668 <mymomo119966.mm@gmail.com>"]
 license = "Apache2.0"
@@ -15,7 +15,6 @@ pillow = "10.4.0"
 pydantic = "2.8.2"
 python-dotenv = "1.0.1"
 tqdm = "4.66.2"
-duckduckgo-search = "6.1.12"
 pyautogen = "0.2.31"
 beartype = "0.18.5"
 langchain = "^0.2.6"

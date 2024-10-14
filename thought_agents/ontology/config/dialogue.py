@@ -1,24 +1,26 @@
 from hydra.core.config_store import ConfigStore
 from dataclasses import dataclass, field
-from typing import Any, Optional, List, Dict, AnyStr
+from typing import Any, Optional, List, Dict
 
 from pydantic import BaseModel, Field
 from thought_agents.ontology.chats.client import AutogenLLMConfig
 
+name_field = Field(..., description="name of the person")
+
 class Person(BaseModel):
-    name: AnyStr = Field(..., description="name of the person")
-    sex: Optional[AnyStr] = Field(..., description="sex of the person")
-    description: AnyStr = Field(..., description="A description of the person if known, otherwise just a generic character.")
+    name: str = name_field
+    sex: Optional[str] = Field(None, description="sex of the person")
+    description: str = Field(..., description="A description of the person if known, otherwise just a generic character.")
 
 class PodcastCharacters(BaseModel):
     hosts: List[Person] = Field(..., description="host of the podcast")
     guests: List[Person] = Field(..., description="list of guests of the podcast")
 
     @property
-    def guest_names(self) -> List[AnyStr]:
+    def guest_names(self) -> List[str]:
         return [guest.name for guest in self.guests]
     @property
-    def host_names(self) -> List[AnyStr]:
+    def host_names(self) -> List[str]:
         return [host.name for host in self.hosts]
 
 class PodcastConfig(BaseModel):
@@ -31,7 +33,7 @@ class PodcastConfig(BaseModel):
 class ConversationConfig(BaseModel):
     llm_config: AutogenLLMConfig
     podcast_config: PodcastConfig
-    system_prompts: Dict[str, Dict | AnyStr]
+    system_prompts: Dict[str, Dict | str]
     
 # Register the configuration with ConfigStore
 # cs = ConfigStore.instance()

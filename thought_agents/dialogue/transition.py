@@ -44,8 +44,8 @@ def research_state_transition(
         ValueError: If the last_speaker is unknown.
     """
     messages = groupchat.messages
-    logger.info(f"Transition: research")
-    logger.info(f"Number of agents: {len(groupchat.agents)}. Agents: {groupchat.agent_names}")
+    logger.debug(f"Transition: research")
+    logger.debug(f"Number of agents: {len(groupchat.agents)}. Agents: {groupchat.agent_names}")
     if len(messages) >= max_round-1:
         return groupchat.agents[-1]  
         # Assuming the script parser is the last agent
@@ -77,8 +77,8 @@ def podcast_state_transition(
     host must come First 
     """
     messages = groupchat.messages
-    logger.info(f"Transition: podcast")
-    logger.info(f"Number of agents: {len(groupchat.agents)}. Agents: {groupchat.agent_names}")
+    logger.debug(f"Transition: podcast")
+    logger.debug(f"Number of agents: {len(groupchat.agents)}. Agents: {groupchat.agent_names}")
     # last round to the script parser
     if len(messages) >= max_round-1:
         return groupchat.agents_by_name("script_parser")  

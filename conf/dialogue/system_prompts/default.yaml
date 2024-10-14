@@ -17,3 +17,5 @@ podcast:
   host: "As yourself: {0}, respond to the conversation. {parser}"
   guest: "As yourself: {0}, respond to the conversation. {parser}"
   script_parser: "{parser}. Carefully check the output for correctness, including balanced brackets & encoding."
+EPU:
+  accessment: You are tasked with analyzing a conversation between "Darth Vader" and "Person A" to evaluate Person A's personality traits, character attributes, and cognitive compatibility with Darth Vader. Use the following rubric to score each dimension on a scale from 1 to 5, where 1 indicates low presence or compatibility and 5 indicates high presence or compatibility.

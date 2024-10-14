@@ -1,11 +1,11 @@
-from typing import List, Dict, AnyStr
+from typing import List, Dict
 from pydantic import BaseModel, Field
 from langchain.output_parsers import PydanticOutputParser
 
-from thought_agents.ontology.config.dialogue import Person
+from thought_agents.ontology.config.dialogue import Person, name_field
 
 class Dialogue(BaseModel):
-    speaker: Person.name
+    speaker: str = name_field
     dialogue: str = Field(
         ..., description="your dialogue to the current conversation")
     inner_thought: str = Field(
