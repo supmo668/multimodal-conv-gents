@@ -2,28 +2,150 @@
 <html>
     <head>
         <title>Autogen WebSocket Test</title>
+        <style>
+            /* Basic styles for the chat interface */
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0 auto;
+                max-width: 800px;
+                padding: 20px;
+            }
+            #jsonMessages {
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin-bottom: 20px;
+                border-radius: 5px;
+            }
+            #jsonMessages li {
+                background-color: #ffeb3b;
+                color: #333;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+            #messages {
+                list-style-type: none;
+                padding: 0;
+            }
+            #messages li {
+                padding: 10px;
+                background-color: #f0f0f0;
+                margin-bottom: 10px;
+                border-radius: 5px;
+            }
+            form {
+                display: flex;
+                margin-bottom: 20px;
+            }
+            input[type="text"] {
+                flex-grow: 1;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-right: 10px;
+            }
+            button {
+                padding: 10px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+        </style>
     </head>
     <body>
         <h1>WebSocket Chat</h1>
         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
+            <button type="submit">Send</button>
         </form>
-        <ul id='messages'></ul>
+        
+        <!-- Regular messages will be displayed here -->
+        <ul id="messages"></ul>
+
+        <!-- JSON messages will be displayed here in a different style -->
+        <div>
+            <h2>Special JSON Messages</h2>
+            <ul id="jsonMessages"></ul>
+        </div>
+
         <script>
             var ws = new WebSocket("ws://localhost:8080/ws");
+
+            // Log WebSocket connection status
+            ws.onopen = function() {
+                console.log("WebSocket connection opened.");
+            };
+
+            // Check if the incoming message is a valid JSON and meets the required format
+            function isValidJsonMessage(data) {
+                try {
+                    var parsedData = JSON.parse(data);
+                    return parsedData && parsedData.message && parsedData.message.content;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // WebSocket message event handler
             ws.onmessage = function(event) {
+                var rawMessage = event.data;
+
+                if (isValidJsonMessage(rawMessage)) {
+                    // Handle JSON-formatted messages
+                    var parsedMessage = JSON.parse(rawMessage);
+                    displayJsonMessage(parsedMessage.message.content);
+                } else {
+                    // Handle non-JSON formatted messages
+                    displayRegularMessage(rawMessage);
+                }
+            };
+
+            // Function to display regular messages
+            function displayRegularMessage(messageText) {
                 var messages = document.getElementById('messages');
                 var message = document.createElement('li');
-                var content = document.createTextNode(event.data);
+                var content = document.createTextNode(messageText);
                 message.appendChild(content);
                 messages.appendChild(message);
+            }
+
+            // Function to display JSON messages in a different location with a different style
+            function displayJsonMessage(jsonContent) {
+                var jsonMessages = document.getElementById('jsonMessages');
+                var message = document.createElement('li');
+                var content = document.createTextNode(jsonContent);
+                message.appendChild(content);
+                jsonMessages.appendChild(message);
+            }
+
+            // WebSocket error handler
+            ws.onerror = function(error) {
+                console.error("WebSocket error:", error);
             };
+
+            // WebSocket close handler
+            ws.onclose = function() {
+                console.log("WebSocket connection closed.");
+            };
+
+            // Function to send message via WebSocket
             function sendMessage(event) {
                 var input = document.getElementById("messageText");
-                ws.send(input.value);
-                input.value = '';
-                event.preventDefault();
+                if (input.value === "") {
+                    console.warn("No message to send");
+                } else {
+                    console.log("Sending message:", input.value);
+                    ws.send(input.value);
+                    input.value = '';
+                }
+                event.preventDefault(); // Prevent form submission
             }
         </script>
     </body>
