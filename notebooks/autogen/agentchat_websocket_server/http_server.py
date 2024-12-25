@@ -3,9 +3,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from autogen.io.websockets import IOWebsockets
 
-from .on_connect import on_connect
+from on_connect import on_connect
 
-html_path = Path(__file__.parent) / "chat.html"
+html_path = Path(__file__).parent / "chat.html"
 
 # Define the custom request handler for serving the HTML file
 class MyRequestHandler(SimpleHTTPRequestHandler):

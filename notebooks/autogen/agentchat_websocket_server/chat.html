@@ -57,15 +57,34 @@
             button:hover {
                 background-color: #45a049;
             }
+            .control-buttons {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .control-buttons button {
+                background-color: #2196F3;
+            }
+            .control-buttons button:hover {
+                background-color: #0b7dda;
+            }
         </style>
     </head>
     <body>
         <h1>WebSocket Chat</h1>
+        
+        <!-- Form for sending messages -->
         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
             <button type="submit">Send</button>
         </form>
-        
+
+        <!-- Control buttons for hand-raise and hand-lower -->
+        <div class="control-buttons">
+            <button onclick="sendHandRaise()">Hand Raise</button>
+            <button onclick="sendHandLower()">Hand Lower</button>
+        </div>
+
         <!-- Regular messages will be displayed here -->
         <ul id="messages"></ul>
 
@@ -96,7 +115,7 @@
             // WebSocket message event handler
             ws.onmessage = function(event) {
                 var rawMessage = event.data;
-
+                console.log("Message received from server:", rawMessage);
                 if (isValidJsonMessage(rawMessage)) {
                     // Handle JSON-formatted messages
                     var parsedMessage = JSON.parse(rawMessage);
@@ -146,6 +165,18 @@
                     input.value = '';
                 }
                 event.preventDefault(); // Prevent form submission
+            }
+
+            // Function to send "raise-hand" message via WebSocket
+            function sendHandRaise() {
+                console.log("Sending hand-raise signal.");
+                ws.send("raise-hand");
+            }
+
+            // Function to send "lower-hand" message via WebSocket
+            function sendHandLower() {
+                console.log("Sending hand-lower signal.");
+                ws.send("lower-hand");
             }
         </script>
     </body>
