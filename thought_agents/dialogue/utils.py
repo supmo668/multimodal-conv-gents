@@ -1,5 +1,5 @@
 import random
-
+import re
 from datetime import datetime
 import os, json, random
 
@@ -45,8 +45,8 @@ def strip_json_string(s: str) -> str:
         return s[start_pos:end_pos + 1]
     else:
         raise ValueError("Input string does not contain valid JSON object boundaries.")
-    
-def prune_conversation(chat_result: List):
+
+def load_json_from_conversation(chat_result: List):
     conv_data = chat_result.chat_history[-1].get('content')
     json_data = strip_json_string(conv_data)
     script_json = json.loads(json_data)
@@ -61,7 +61,8 @@ def save_conversation(chat_result, output_dir=Path("outputs/conversations"), nam
     # Create the output file path
     output_file_path = os.path.join(output_dir, f'{name}_json_{current_datetime_str}.json')
     # Write the list of nested JSON objects to the file
-    conv_json = prune_conversation(chat_result)
+    conv_json = load_json_from_conversation(chat_result)
     with open(output_file_path, 'w') as output_file:
         json.dump(conv_json, output_file, indent=4, ensure_ascii=False)
     print(f"JSON list saved to {output_file_path}")
+

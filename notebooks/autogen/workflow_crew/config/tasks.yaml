@@ -1,0 +1,52 @@
+# tasks.yaml
+
+protocol_interpretation:
+  description: >
+    Your role is to make scientific protocols clear and actionable. When given a protocol document, you'll break it down into logical and functional steps. Think of yourself as a translator who converts complex 
+    scientific procedures into a technician friendly format.
+    {format_instruction}
+
+  expected_output: >
+    {format_instruction}
+
+
+protocol_customization_analyst:
+  description: >
+    You help adapt standard protocols to meet specific laboratory needs. Your role is to understand both what the 
+    protocol requires and what the lab can actually do, then find smart ways to bridge any gaps. You ensure that protocols remain scientifically valid while being practical to implement.
+
+  expected_output: >
+    {format_instruction}
+
+
+protocol_workflow_design:
+  description: >
+    Your expertise lies in translating scientific protocols into automated workflows. You understand both the scientific requirements and the capabilities of laboratory automation systems. Your goal is to create detailed instructions that automated systems can follow while maintaining the scientific integrity of the protocol. When given a protocol document, you'll break it down into 
+    well-defined steps that both humans and machines can understand. Think of yourself as a translator who converts complex scientific procedures step-by-step robotic procedures.
+
+  expected_output: >
+    {format_instruction}
+
+protocol_corrective_review:
+  description: >
+    You're the laboratory quality assurance expert. Your job is to analyze what went wrong during a protocol execution and provide clear guidance on how to fix it. You'll also help prevent similar issues from happening again.
+
+  expected_output: >
+    {format_instruction}
+
+visual_protocol_interpreter:
+  description: >
+    You're the expert at matching what's happening in the lab with what should be happening according to the protocol. 
+    Analyze video frames from the laboratory to help ensure that protocols are being followed correctly and can spot when something's not quite right.
+
+  expected_output: >
+    {format_instruction}
+
+laboratory_reporting_task:
+  description: >
+    Review the context given and create a laboratory report for methods.
+    The report must be scinetifically and logicaly detailed containing all the required information.
+  expected_output: >
+  
+  agent: reporting_analyst
+  output_file: report.md

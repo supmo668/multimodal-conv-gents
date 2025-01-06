@@ -3,6 +3,9 @@ agent_data/
 tmp/
 conf/*.txt
 
+# llm secrets
+OAI_CONFIG_LIST
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

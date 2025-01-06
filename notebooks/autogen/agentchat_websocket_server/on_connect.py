@@ -11,6 +11,10 @@ def on_connect(iostream: IOWebsockets) -> None:
     print(f" - on_connect(): Connected to client using IOWebsockets {iostream}", flush=True)
 
     try:
+        
+        import asyncio
+        asyncio.create_task(human_proxy.monitor_hand_raise())
+            
         # 1. Receive Initial Message
         initial_msg = "talk about anything you want"
         # initial_msg = iostream.input()  # Blocking until a message is received

@@ -22,6 +22,9 @@ class PodcastCharacters(BaseModel):
     @property
     def host_names(self) -> List[str]:
         return [host.name for host in self.hosts]
+    @property
+    def n_characters(self) -> int:
+        return len(self.hosts) + len(self.guests)
 
 class PodcastConfig(BaseModel):
     topic: str = Field(default="Natural Conversation", description="topic of the podcast")

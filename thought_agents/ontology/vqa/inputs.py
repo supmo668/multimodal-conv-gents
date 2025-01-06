@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_validator, ValidationError
 from langchain_core.pydantic_v1 import BaseModel as langchainBaseModel, Field
 
 from thought_agents.utils.registry import parser_registry, prompt_registry
-from thought_agents.ontology.parser.scorer import TASK_SCORER
+from thought_agents.ontology.parser.web_task import TASK_SCORER
 
 from thought_agents.ontology.config.llm_client import model_client_config
 

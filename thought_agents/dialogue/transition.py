@@ -8,23 +8,23 @@ from thought_agents.ontology.config.dialogue import PodcastConfig
 
 from .utils import weighted_choice
 
-from thought_agents.utils.logger import setup_logger
+from thought_agents.utils.logger import logger
 
-logger = setup_logger('main_logger', 'app.log')
 
 @beartype
 def get_state_transition(
-    podcast_cfg: PodcastConfig, transition="podcast.default", MAX_ROUND=10):
+    podcast_cfg: PodcastConfig, transition="podcast.default", MAX_ROUND=None):
     """
     Get the state transition function from the registry based on the transition type.
     """
     state_transition_func = transition_registry.get_class(transition)
     if not state_transition_func:
         raise ValueError(f"No state transition function registered for transition type: {transition}")
-    def state_transition_wrapper(last_speaker, groupchat, max_round=MAX_ROUND):
+    def state_transition_wrapper(
+        last_speaker, groupchat, max_round=MAX_ROUND):
         kwargs = {}
         return state_transition_func(
-            last_speaker, groupchat, podcast_cfg.character_cfg, max_round, **kwargs
+            last_speaker, groupchat, podcast_cfg.character_cfg, max_round=max_round, **kwargs
         )
     return state_transition_wrapper
 
@@ -85,7 +85,7 @@ def podcast_state_transition(
     if last_speaker.name in character_cfg.guest_names + character_cfg.host_names:
         # Choose between next speaker based on non-host weightings
         next_speaker = weighted_choice(
-            [a for a, name in zip(groupchat.agents, groupchat.agent_names) if name in character_cfg.host_names+character_cfg.guest_names],
+            [a for a, name in zip(groupchat.agents, groupchat.agent_names) if name in character_cfg.host_names+ character_cfg.guest_names],
             last_speaker,
             hosts=[groupchat.agent_by_name(n) for n in character_cfg.host_names],
             host_chance_factor=host_chance_factor, 
@@ -104,10 +104,59 @@ def full_podcast_state_transition(
     match last_speaker.name.lower():
         case "init" | "coder" | "research_coder"| "executor" | "informer":
             speaker= research_state_transition(
-                last_speaker, groupchat, destination_agent=character_cfg.hosts[0].name)
-        case _: # podcast characters and all others
+                last_speaker, groupchat, destination_agent=character_cfg.hosts[0].name
+            )
+        case _: 
+            # podcast characters and all others
             speaker = podcast_state_transition(
                 last_speaker, groupchat, character_cfg, max_round)
+    if type(speaker) == str:
+        speaker = groupchat.agent_by_name(speaker)
+    return speaker
+
+
+@transition_registry.register("epu.character_assessment")
+def character_assessment_state_transition(
+    last_speaker, groupchat, character_cfg, assessor_name="epu_character_assessor", **kwargs
+    ):
+    
+    """
+    State transition function for the character assessment task.
+    Parameters:
+        - assessor_name: str (optional)
+            The name of the agent that is responsible for assessing the character. Defaults to "epu_character_assessor"
+            choices: "epu_interactibility_assessor", ""epu_character_assessor"
+            Refer to the names in `agent.py`
+    Returns:
+        Agent: The next speaker in the dialogue.
+    """
+    messages = groupchat.messages
+    if len(messages) >= len(groupchat.agents):
+        # last agent must be the parsing agent
+        return groupchat.agent_by_name(assessor_name) 
+    match last_speaker.name.lower():
+        case "init" | "coder" | "research_coder"| "executor" | "informer":
+            # speaker= research_state_transition(
+            #     last_speaker, groupchat, destination_agent=assessor_name)
+            speaker = groupchat.agent_by_name(assessor_name) 
+    if type(speaker) == str:
+        speaker = groupchat.agent_by_name(speaker)
+    return speaker
+
+@transition_registry.register("epu.interactibility_assessor")
+def interactability_assessment_state_transition(
+    last_speaker, groupchat, **kwargs):
+    assessor_name = "epu_interactibility_assessor"
+    messages = groupchat.messages
+    if len(messages) > len(groupchat.agents):
+        # last agent must be the parsing agent
+        return groupchat.agent_by_name(assessor_name)     
+    match last_speaker.name.lower():
+        case "init" | "coder" | "research_coder"| "executor" | "informer":
+            speaker= research_state_transition(
+                last_speaker, groupchat, destination_agent=assessor_name)
+        case _:
+            return groupchat.agent_by_name(assessor_name) 
     if type(speaker) == str:
         speaker = groupchat.agent_by_name(speaker)
     return speaker

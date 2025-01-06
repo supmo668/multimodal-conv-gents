@@ -11,3 +11,5 @@ def setup_logger(name, log_file, level=logging.INFO):
     logger.addHandler(handler)
     
     return logger
+
+logger = setup_logger('main_logger', 'thought_agents.log')

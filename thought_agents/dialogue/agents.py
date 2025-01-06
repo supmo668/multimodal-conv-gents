@@ -7,6 +7,8 @@ from thought_agents.dialogue.tools import generate_llm_config
 from thought_agents.ontology.chats.client import AutogenLLMConfig
 from thought_agents.ontology.config.dialogue import ConversationConfig, Person
 from thought_agents.ontology.parser.dialogue import podcast_parser, dialogue_parser
+from thought_agents.ontology.parser.epu.character import character_assessment_parser
+from thought_agents.ontology.parser.epu.interactability import interactivability_assessment_parser
 
 from thought_agents.utils.registry import agent_registry
 from thought_agents.web.summarizer import WebSummarizer
@@ -72,10 +74,14 @@ def create_research_agents(
         match n:
             case "research_coder":
                 kwargs = {
-                    'code_execution_config': {"last_n_messages": 3, "work_dir": "_outputs/code", "use_docker": False},
+                    'code_execution_config': {
+                        "last_n_messages": 3, 
+                        "work_dir": "_outputs/code", "use_docker": False
+                    },
                     'llm_config': llm_config.model_dump()
                 }
-                kwargs['llm_config'].update({'functions': [generate_llm_config(WebSummarizer(llm_config.model))]})
+                kwargs['llm_config'].update({'functions': [generate_llm_config(
+                    WebSummarizer(llm_config.model))]})
             case _:
                 kwargs = {'llm_config': llm_config.model_dump()}
         agents.append(
@@ -87,12 +93,15 @@ def create_research_agents(
         )
     return agents
 
+
 @agent_registry.register(name="podcast.parser")
 @beartype
-def create_parser_agents(
+def create_podcast_parsers(
     llm_config: AutogenLLMConfig,
     system_prompts: dict[str, dict]
 ) -> list[autogen.AssistantAgent]:
+    # terminate condition: both "abstract" and "script" present in content
+    
     script_parser = autogen.AssistantAgent(
         name="script_parser",
         llm_config=llm_config.model_dump(),
@@ -103,6 +112,42 @@ def create_parser_agents(
         ),
     )
     return [script_parser]
+
+@agent_registry.register(name="epu.character_assessment")
+@beartype
+def create_epu_character_parsers(
+    llm_config: AutogenLLMConfig,
+    system_prompts: dict[str, dict]
+) -> list[autogen.AssistantAgent]:
+    """emotional processing assessment parser"""
+    epu_parser = autogen.AssistantAgent(
+        name="epu_character_assessor",
+        llm_config=llm_config.model_dump(),
+        human_input_mode="NEVER",
+        is_termination_msg=lambda msg: all([s in msg["content"].lower() for s in ["abstract", "script"]]),
+        system_message=system_prompts['epu']['assessment_parser'].format(
+            parser=character_assessment_parser.get_format_instructions(),
+        ),
+    )
+    return [epu_parser]
+
+@agent_registry.register(name="epu.interactability_assessment")
+@beartype
+def create_epu_behavioral_parsers(
+    llm_config: AutogenLLMConfig,
+    system_prompts: dict[str, dict]
+) -> list[autogen.AssistantAgent]:
+    """emotional processing assessment parser"""
+    epu_parser = autogen.AssistantAgent(
+        name="epu_interactibility_assessor",
+        llm_config=llm_config.model_dump(),
+        human_input_mode="NEVER",
+        is_termination_msg=lambda msg: all([s in msg["content"].lower() for s in ["abstract", "script"]]),
+        system_message=system_prompts['epu']['assessment_parser'].format(
+            parser=interactivability_assessment_parser.get_format_instructions()
+        ),
+    )
+    return [epu_parser]
 
 
 

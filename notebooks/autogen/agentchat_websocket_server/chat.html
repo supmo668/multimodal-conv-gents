@@ -170,13 +170,13 @@
             // Function to send "raise-hand" message via WebSocket
             function sendHandRaise() {
                 console.log("Sending hand-raise signal.");
-                ws.send("raise-hand");
+                ws.send("[HUMANSIGNAL]raise-hand");
             }
 
             // Function to send "lower-hand" message via WebSocket
             function sendHandLower() {
                 console.log("Sending hand-lower signal.");
-                ws.send("lower-hand");
+                ws.send("[HUMANSIGNAL]lower-hand");
             }
         </script>
     </body>

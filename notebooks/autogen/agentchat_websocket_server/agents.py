@@ -11,17 +11,20 @@ class HandRaiseConversableAgent(ConversableAgent):
         self.default_message = "skip"  # Default message
 
     async def monitor_hand_raise(self):
-        """Asynchronously monitor the WebSocket for hand-raise signals."""
+        """Monitor the WebSocket for hand-raise signals."""
         if not self.websocket_uri:
             return
 
         async with IOWebsockets.connect(self.websocket_uri) as ws:
             async for message in ws:
-                if message == "raise-hand":
-                    print("Hand-raise detected!")
+                if "[HUMANSIGNAL]raise-hand" in message:
+                    print("Hand-raise signal received.")
                     self.hand_raise = True
-                elif message == "lower-hand":
-                    print("Hand-raise cleared.")
+                    iostream = IOStream.get_default()
+                    if iostream:
+                        iostream.output("[HUMANSIGNAL]raise-hand")
+                elif "[HUMANSIGNAL]lower-hand" in message:
+                    print("Lower-hand signal received.")
                     self.hand_raise = False
 
     def get_human_input(self, prompt: str) -> str:
@@ -36,26 +39,26 @@ class HandRaiseConversableAgent(ConversableAgent):
             print(f"No hand-raise detected. Returning default message: '{self.default_message}'")
             return self.default_message
 
+human_termination = lambda msg: "[HANDRAISE]" in msg["content"]
+
 agent1 = ConversableAgent(
     "agent1",
     system_message="You are have an indefinite conversation for fun, you can talk about anything but you must always reply and add a question for following up.",
     llm_config=llm_config,
-    # is_termination_msg=lambda msg: "53" in msg["content"],  # terminate if the number is guessed by the other agent
+    is_termination_msg=human_termination,
     human_input_mode="NEVER",  # never ask for human input
 )
 agent2 = ConversableAgent(
     "agent2",
     system_message="You are have an indefinite conversation for fun, you can talk about anything but you must always reply and add a question for following up.",
     llm_config=llm_config,
-    # is_termination_msg=lambda msg: "53" in msg["content"],  # terminate if the number is guessed by the other agent
+    is_termination_msg=human_termination,
     human_input_mode="NEVER",  # never ask for human input
 )
 
 human_proxy = HandRaiseConversableAgent(
     "human_proxy",
     llm_config=False,  # no LLM used for human proxy
-    is_termination_msg=lambda msg: "CORRECT!" in msg["content"],
-    # terminate if the number is guessed by the other agent
     human_input_mode="ALWAYS",  # always ask for human input
 )
 def custom_speaker_selection_func(last_speaker: Agent, groupchat: GroupChat):
