@@ -13,7 +13,7 @@ def on_connect(iostream: IOWebsockets) -> None:
     try:
         
         import asyncio
-        asyncio.create_task(human_proxy.monitor_hand_raise())
+        # asyncio.create_task(human_proxy.monitor_hand_raise())
             
         # 1. Receive Initial Message
         initial_msg = "talk about anything you want"
